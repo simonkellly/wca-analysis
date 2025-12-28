@@ -1,0 +1,14 @@
+{
+  "name": "WCA Analysis",
+  "features": {
+    "ghcr.io/devcontainers-extra/features/bun:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "oven.bun-vscode"
+      ]
+    }
+  },
+  "postCreateCommand": "bun install && bun run db"
+}
