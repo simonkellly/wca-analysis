@@ -24,7 +24,7 @@ jobs:
         run: bun run db
 
       - name: Build API
-        run: bun run api:build:quick
+        run: bun run api:build
 
       - name: Deploy to api branch
         uses: peaceiris/actions-gh-pages@v4
