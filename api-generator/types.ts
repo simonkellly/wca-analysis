@@ -9,7 +9,6 @@ export type ApiCompetition = {
   organisers: { name: string; email: string }[];
   venue: { name: string; address: string; details: string | null; coordinates: { latitude: number; longitude: number } };
   information: string | null; externalWebsite: string | null;
-  registrationOpen: string | null; registrationClose: string | null;
 };
 
 export type ApiChampionship = ApiCompetition & { region?: string };

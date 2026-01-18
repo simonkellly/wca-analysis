@@ -32,8 +32,6 @@ export type Competition = {
   end_day: number;
   latitude_microdegrees: number;
   longitude_microdegrees: number;
-  registration_open?: string;
-  registration_close?: string;
 };
 
 export type Continent = {
@@ -143,7 +141,6 @@ export function processChampionshipTSVString(line: string): Championship {
 }
 
 export function processCompetitionTSVString(line: string): Competition {
-  const parts = line.split('\t');
   const [
     id,
     name,
@@ -167,9 +164,7 @@ export function processCompetitionTSVString(line: string): Competition {
     end_day,
     latitude_microdegrees,
     longitude_microdegrees,
-    registration_open,
-    registration_close,
-  ] = parts;
+  ] = line.split('\t');
   return {
     id,
     name,
@@ -193,8 +188,6 @@ export function processCompetitionTSVString(line: string): Competition {
     end_day: parseInt(end_day),
     latitude_microdegrees: parseInt(latitude_microdegrees),
     longitude_microdegrees: parseInt(longitude_microdegrees),
-    registration_open: registration_open || undefined,
-    registration_close: registration_close || undefined,
   };
 }
 

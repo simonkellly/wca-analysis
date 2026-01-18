@@ -859,18 +859,6 @@ components:
           type: string
         externalWebsite:
           type: string
-        registrationOpen:
-          type: string
-          format: date-time
-          nullable: true
-          description: The date and time when registration opens for this competition
-          example: '2023-12-01T00:00:00Z'
-        registrationClose:
-          type: string
-          format: date-time
-          nullable: true
-          description: The date and time when registration closes for this competition
-          example: '2023-12-15T23:59:59Z'
     Championship:
       allOf:
         - $ref: '#/components/schemas/Competition'
