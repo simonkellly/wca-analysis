@@ -32,7 +32,7 @@ jobs:
         run: bun run db
 
       - name: Build API
-        run: bun run api:build:quick
+        run: bun run api:build
 
       - name: Verify API output
         run: |
@@ -50,7 +50,12 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config core.preloadindex true
           git config core.fscache true
+          git config core.untrackedCache true
+          git config index.threads 4
+          git config pack.threads 4
+          git config pack.compression 1
+          git config transfer.unpackLimit 1
           git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} 2>/dev/null || git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git add -A >/dev/null 2>&1
           git commit -q -m "Update API - ${{ github.run_id }}"
-          git push -q origin HEAD:api --force
+          git push -q origin HEAD:api --force --no-verify
