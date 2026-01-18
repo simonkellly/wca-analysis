@@ -1,6 +1,9 @@
 name: Build API
 
 on:
+  push:
+    branches-ignore:
+      - api
   schedule:
     - cron: '0 6 * * *'  # Daily at 6 AM UTC
   workflow_dispatch:
