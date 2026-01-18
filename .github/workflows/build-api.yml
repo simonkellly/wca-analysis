@@ -8,9 +8,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -27,10 +32,15 @@ jobs:
         run: bun run api:build
 
       - name: Deploy to api branch
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./api-output
-          publish_branch: api
-          force_orphan: true
-          commit_message: "Update API - ${{ github.run_id }}"
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global core.preloadindex true
+          git config --global core.fscache true
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git checkout --orphan api 2>/dev/null || (git checkout api && git rm -rf .)
+          mv api-output/* api-output/.[!.]* . 2>/dev/null || mv api-output/* .
+          rmdir api-output 2>/dev/null || true
+          git add -A
+          git commit -m "Update API - ${{ github.run_id }}"
+          git push origin api --force
