@@ -27,21 +27,11 @@ async function main() {
   const apis = args.length && !args[0].startsWith("--") ? args[0].split(",").filter(a => GENERATORS[a]) : DEFAULT_ORDER;
   
   console.log(`Building API → ${API_OUTPUT_DIR}/`);
-  await rm(API_OUTPUT_DIR, { recursive: true, force: true });
-  await mkdir(API_OUTPUT_DIR, { recursive: true });
+  await Bun.$`rm -rf ${API_OUTPUT_DIR}`;
+  await Bun.$`mkdir -p ${API_OUTPUT_DIR}`;
   
   const ctx = apis.some(a => NEEDS_DATA.has(a)) ? await loadData() : undefined;
-  
-  const start = Date.now();
-  for (const api of apis) {
-    console.log(`  - ${api}...`);
-    const t = Date.now();
-    await GENERATORS[api](ctx);
-    console.log(`    ✓ ${((Date.now() - t) / 1000).toFixed(1)}s`);
-  }
-  
-  const sec = (Date.now() - start) / 1000;
-  console.log(`\nDone in ${sec > 60 ? `${Math.floor(sec / 60)}m ${Math.round(sec % 60)}s` : `${Math.round(sec)}s`}`);
+  await Promise.all(apis.map(api => GENERATORS[api](ctx)));
 }
 
 main().catch(console.error);

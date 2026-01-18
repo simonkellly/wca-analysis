@@ -13,7 +13,8 @@ export async function generateCompetitions(ctx?: DataContext): Promise<void> {
     writes.push({ path: i === 0 ? "competitions.json" : `competitions-page-${i + 1}.json`, data: createOverview(pages[i], i + 1, total) });
   }
   
-  for (const [k, v] of groupBy(apiComps, c => c.country)) writes.push({ path: `competitions/${k}.json`, data: createOverview(v) });
+  const countryGroups = groupBy(apiComps, c => c.country);
+  for (const [k, v] of countryGroups) writes.push({ path: `competitions/${k}.json`, data: createOverview(v) });
   for (const [k, v] of groupBy(apiComps, c => c.date.from.slice(0, 4))) writes.push({ path: `competitions/${k}.json`, data: createOverview(v) });
   for (const [k, v] of groupBy(apiComps, c => c.date.from.slice(0, 7).replace("-", "/"))) writes.push({ path: `competitions/${k}.json`, data: createOverview(v) });
   for (const [k, v] of groupBy(apiComps, c => c.date.from.replace(/-/g, "/"))) writes.push({ path: `competitions/${k}.json`, data: createOverview(v) });

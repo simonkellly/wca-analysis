@@ -2,6 +2,7 @@ import { dirname } from "node:path";
 import { mkdir } from "node:fs/promises";
 import type { Competition } from "../lib/schema";
 import type { ApiCompetition, ApiOverview } from "./types";
+import { getCountryIso2Code } from "./generators/countries";
 
 export const API_OUTPUT_DIR = "api-output";
 export const PAGE_SIZE = 1000;
@@ -89,7 +90,7 @@ export function transformCompetition(c: Competition, region?: string): ApiCompet
   const from = new Date(c.year, c.month - 1, c.day);
   const till = new Date(c.end_year, c.end_month - 1, c.end_day);
   return {
-    id: c.id, name: c.name, city: c.city_name, country: c.country_id,
+    id: c.id, name: c.name, city: c.city_name, country: getCountryIso2Code(c.country_id),
     date: { from: `${c.year}-${pad(c.month)}-${pad(c.day)}`, till: `${c.end_year}-${pad(c.end_month)}-${pad(c.end_day)}`, numberOfDays: Math.ceil((till.getTime() - from.getTime()) / 86400000) + 1 },
     isCanceled: c.cancelled === 1,
     events: c.event_specs?.split(" ").filter(e => EVENT_IDS.includes(e)) || [],

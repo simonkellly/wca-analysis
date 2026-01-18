@@ -1,7 +1,7 @@
 import type { DataContext } from "../data";
 import { loadData } from "../data";
 import { createOverview, PAGE_SIZE, writeBatched, EVENT_IDS, groupBy } from "../utils";
-import { getCountryContinent } from "./countries";
+import { getCountryContinent, getCountryIso2Code } from "./countries";
 import type { RanksSingle, RanksAverage } from "../../lib/schema";
 
 type RankEntry = RanksSingle | RanksAverage;
@@ -34,28 +34,29 @@ export async function generateRanks(ctx?: DataContext): Promise<void> {
       const byContinent = new Map<string, RankEntry[]>();
       
       for (const rank of ranks) {
-        const countryId = pc.get(rank.person_id);
-        if (!countryId) continue;
+        const wcaCountryId = pc.get(rank.person_id);
+        if (!wcaCountryId) continue;
         
-        const countryRanks = byCountry.get(countryId) ?? [];
-        if (!byCountry.has(countryId)) byCountry.set(countryId, countryRanks);
+        const countryIso2 = getCountryIso2Code(wcaCountryId);
+        const countryRanks = byCountry.get(countryIso2) ?? [];
+        if (!byCountry.has(countryIso2)) byCountry.set(countryIso2, countryRanks);
         countryRanks.push(rank);
         
-        const continentId = getCountryContinent(countryId);
+        const continentId = getCountryContinent(countryIso2);
         const continentRanks = byContinent.get(continentId) ?? [];
         if (!byContinent.has(continentId)) byContinent.set(continentId, continentRanks);
         continentRanks.push(rank);
       }
       
-      for (const [continentId, continentRanks] of byContinent) {
-        const sorted = continentRanks.sort((a, b) => a.continent_rank - b.continent_rank).slice(0, PAGE_SIZE);
-        if (sorted.length > 0) regionMap.set(continentId, sorted);
-      }
+      const addSortedRanks = (map: Map<string, RankEntry[]>, sortFn: (a: RankEntry, b: RankEntry) => number) => {
+        for (const [id, entries] of map) {
+          const sorted = entries.sort(sortFn).slice(0, PAGE_SIZE);
+          if (sorted.length > 0) regionMap.set(id, sorted);
+        }
+      };
       
-      for (const [countryId, countryRanks] of byCountry) {
-        const sorted = countryRanks.sort((a, b) => a.country_rank - b.country_rank).slice(0, PAGE_SIZE);
-        if (sorted.length > 0) regionMap.set(countryId, sorted);
-      }
+      addSortedRanks(byContinent, (a, b) => a.continent_rank - b.continent_rank);
+      addSortedRanks(byCountry, (a, b) => a.country_rank - b.country_rank);
       
       eventRegions.set(rankType, regionMap);
     }
@@ -63,10 +64,8 @@ export async function generateRanks(ctx?: DataContext): Promise<void> {
     ranksByRegion.set(eventId, eventRegions);
   }
   
-  const types = ["single", "average"] as const;
   const writes: Array<{ path: string; data: unknown }> = [];
   
-  // Generate files for all regions that have data
   for (const [eventId, byType] of ranksByRegion) {
     for (const [rankType, regionMap] of byType) {
       for (const [regionId, rankedEntries] of regionMap) {

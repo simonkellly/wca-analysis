@@ -2,6 +2,7 @@ import type { DataContext } from "../data";
 import { loadData } from "../data";
 import type { ApiPerson, ApiPersonRank, ApiPersonResult } from "../types";
 import { createOverview, groupBy, progress, slugify, writeBatch, ROUND_NAMES, FORMAT_NAMES, PAGE_SIZE } from "../utils";
+import { getCountryIso2Code } from "./countries";
 
 export async function generatePersons(ctx?: DataContext): Promise<void> {
   const { persons: personData, ranksSingle, ranksAverage, results, championships } = ctx || await loadData();
@@ -29,38 +30,59 @@ export async function generatePersons(ctx?: DataContext): Promise<void> {
     const id = person.wca_id;
     const personResults = resultsByPerson.get(id) || [];
     
-    const competitionIdsSet = new Set<string>();
-    const championshipIdsSet = new Set<string>();
+    const competitionIds = new Set<string>();
+    const championshipIds = new Set<string>();
     const medals = { gold: 0, silver: 0, bronze: 0 };
     const records = { single: { WR: 0, CR: 0, NR: 0 }, average: { WR: 0, CR: 0, NR: 0 } };
-    const results2: Record<string, Record<string, ApiPersonResult[]>> = {};
+    const resultsByCompetition: Record<string, Record<string, ApiPersonResult[]>> = {};
     
     for (const r of personResults) {
-      const ev = r.event_id, cid = r.competition_id;
-      competitionIdsSet.add(cid);
-      if (champCompIds.has(cid)) championshipIdsSet.add(cid);
+      const { event_id: ev, competition_id: cid, round_type_id, pos, best, average, format_id, attempts, regional_single_record: sr, regional_average_record: ar } = r;
       
-      (results2[cid] ??= {})[ev] ??= [];
-      results2[cid][ev].push({
-        round: ROUND_NAMES[r.round_type_id] || r.round_type_id, position: r.pos,
-        best: r.best, average: r.average, format: FORMAT_NAMES[r.format_id] || r.format_id, solves: r.attempts,
+      competitionIds.add(cid);
+      if (champCompIds.has(cid)) championshipIds.add(cid);
+      
+      (resultsByCompetition[cid] ??= {})[ev] ??= [];
+      resultsByCompetition[cid][ev].push({
+        round: ROUND_NAMES[round_type_id] || round_type_id,
+        position: pos,
+        best,
+        average,
+        format: FORMAT_NAMES[format_id] || format_id,
+        solves: attempts,
       });
       
-      if ((r.round_type_id === "f" || r.round_type_id === "g") && r.pos <= 3) {
-        if (r.pos === 1) medals.gold++; else if (r.pos === 2) medals.silver++; else medals.bronze++;
+      if ((round_type_id === "f" || round_type_id === "g") && pos <= 3) {
+        if (pos === 1) medals.gold++;
+        else if (pos === 2) medals.silver++;
+        else medals.bronze++;
       }
       
-      const sr = r.regional_single_record, ar = r.regional_average_record;
-      if (sr === "WR") records.single.WR++; else if (sr === "CR") records.single.CR++; else if (sr === "NR") records.single.NR++;
-      if (ar === "WR") records.average.WR++; else if (ar === "CR") records.average.CR++; else if (ar === "NR") records.average.NR++;
+      if (sr === "WR") records.single.WR++;
+      else if (sr === "CR") records.single.CR++;
+      else if (sr === "NR") records.single.NR++;
+      
+      if (ar === "WR") records.average.WR++;
+      else if (ar === "CR") records.average.CR++;
+      else if (ar === "NR") records.average.NR++;
     }
     
     const apiPerson: ApiPerson = {
-      id, name: person.name, slug: slugify(person.name), country: person.country_id,
-      numberOfCompetitions: competitionIdsSet.size, competitionIds: [...competitionIdsSet],
-      numberOfChampionships: championshipIdsSet.size, championshipIds: [...championshipIdsSet],
-      rank: { singles: (singlesByPerson.get(id) || []).map(toRank), averages: (averagesByPerson.get(id) || []).map(toRank) },
-      medals, records, results: results2,
+      id,
+      name: person.name,
+      slug: slugify(person.name),
+      country: getCountryIso2Code(person.country_id),
+      numberOfCompetitions: competitionIds.size,
+      competitionIds: [...competitionIds],
+      numberOfChampionships: championshipIds.size,
+      championshipIds: [...championshipIds],
+      rank: {
+        singles: (singlesByPerson.get(id) || []).map(toRank),
+        averages: (averagesByPerson.get(id) || []).map(toRank),
+      },
+      medals,
+      records,
+      results: resultsByCompetition,
     };
     
     writes.push({ path: `persons/${id}.json`, data: apiPerson });

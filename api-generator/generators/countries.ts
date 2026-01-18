@@ -115,4 +115,23 @@ export async function generateCountries(): Promise<void> {
 }
 
 export const getCountryContinent = (iso2: string) => COUNTRY_CONTINENT[iso2] || "world";
+
+const buildCountryMaps = () => {
+  const nameToIso2 = new Map<string, string>();
+  const iso2ToIso2 = new Map<string, string>();
+  for (const { name, iso2Code } of COUNTRIES) {
+    nameToIso2.set(name.toLowerCase(), iso2Code);
+    iso2ToIso2.set(iso2Code.toUpperCase(), iso2Code);
+  }
+  return { nameToIso2, iso2ToIso2 };
+};
+
+const { nameToIso2, iso2ToIso2 } = buildCountryMaps();
+
+export function getCountryIso2Code(wcaCountryId: string): string {
+  if (!wcaCountryId) return wcaCountryId;
+  const upper = wcaCountryId.toUpperCase();
+  return iso2ToIso2.get(upper) ?? nameToIso2.get(wcaCountryId.toLowerCase()) ?? wcaCountryId;
+}
+
 export { COUNTRIES };
