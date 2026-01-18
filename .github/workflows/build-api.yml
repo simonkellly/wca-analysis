@@ -32,7 +32,7 @@ jobs:
         run: bun run db
 
       - name: Build API
-        run: bun run api:build
+        run: bun run api:build:quick
 
       - name: Verify API output
         run: |
@@ -51,6 +51,6 @@ jobs:
           git config core.preloadindex true
           git config core.fscache true
           git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} 2>/dev/null || git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git add -A -q
+          git add -A >/dev/null 2>&1
           git commit -q -m "Update API - ${{ github.run_id }}"
           git push -q origin HEAD:api --force
