@@ -44,17 +44,13 @@ jobs:
 
       - name: Deploy to api branch
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global core.preloadindex true
-          git config --global core.fscache true
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          mv api-output /tmp/api-output-backup
-          git branch -D api 2>/dev/null || true
-          git checkout --orphan api
-          git rm -rf . 2>/dev/null || true
-          mv /tmp/api-output-backup/* /tmp/api-output-backup/.[!.]* . 2>/dev/null || mv /tmp/api-output-backup/* .
-          rmdir /tmp/api-output-backup 2>/dev/null || true
+          cd api-output
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config core.preloadindex true
+          git config core.fscache true
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} || git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git add -A
           git commit -m "Update API - ${{ github.run_id }}"
-          git push origin api --force
+          git push origin HEAD:api --force
