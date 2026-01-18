@@ -45,12 +45,12 @@ jobs:
       - name: Deploy to api branch
         run: |
           cd api-output
-          git init
+          git init -q
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config core.preloadindex true
           git config core.fscache true
-          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} || git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git add -A
-          git commit -m "Update API - ${{ github.run_id }}"
-          git push origin HEAD:api --force
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} 2>/dev/null || git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git add -A -q
+          git commit -q -m "Update API - ${{ github.run_id }}"
+          git push -q origin HEAD:api --force
