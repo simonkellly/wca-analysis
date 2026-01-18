@@ -97,6 +97,8 @@ export function transformCompetition(c: Competition, region?: string): ApiCompet
     wcaDelegates: parseDelegate(c.delegates), organisers: parseDelegate(c.organizers),
     venue: { name: c.venue || "", address: c.venue_address || "", details: c.venue_details || null, coordinates: { latitude: c.latitude_microdegrees / 1e6, longitude: c.longitude_microdegrees / 1e6 } },
     information: c.information || null, externalWebsite: c.external_website || null,
+    registrationOpen: c.registration_open || null,
+    registrationClose: c.registration_close || null,
     ...(region && { region }),
   };
 }
