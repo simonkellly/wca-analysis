@@ -1,8 +1,7 @@
 import type { DataContext } from "../data";
 import { loadData } from "../data";
 import { createOverview, PAGE_SIZE, writeBatched, EVENT_IDS, groupBy } from "../utils";
-import { CONTINENTS } from "./continents";
-import { COUNTRIES, getCountryContinent } from "./countries";
+import { getCountryContinent } from "./countries";
 import type { RanksSingle, RanksAverage } from "../../lib/schema";
 
 type RankEntry = RanksSingle | RanksAverage;
@@ -64,17 +63,16 @@ export async function generateRanks(ctx?: DataContext): Promise<void> {
     ranksByRegion.set(eventId, eventRegions);
   }
   
-  const regions = ["world", ...CONTINENTS.map(c => c.id), ...COUNTRIES.map(c => c.iso2Code)];
   const types = ["single", "average"] as const;
   const writes: Array<{ path: string; data: unknown }> = [];
   
-  for (const r of regions) {
-    for (const t of types) {
-      for (const e of EVENT_IDS) {
-        const rankedEntries = ranksByRegion.get(e)?.get(t)?.get(r) || [];
+  // Generate files for all regions that have data
+  for (const [eventId, byType] of ranksByRegion) {
+    for (const [rankType, regionMap] of byType) {
+      for (const [regionId, rankedEntries] of regionMap) {
         if (rankedEntries.length > 0) {
-          writes.push({ path: `rank/${r}/${t}/${e}.json`, data: createOverview(rankedEntries.map(x => ({
-            rankType: t, personId: x.person_id, eventId: x.event_id, best: x.best,
+          writes.push({ path: `rank/${regionId}/${rankType}/${eventId}.json`, data: createOverview(rankedEntries.map(x => ({
+            rankType, personId: x.person_id, eventId: x.event_id, best: x.best,
             rank: { world: x.world_rank, continent: x.continent_rank, country: x.country_rank },
           })))});
         }

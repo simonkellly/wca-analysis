@@ -34,6 +34,14 @@ jobs:
       - name: Build API
         run: bun run api:build
 
+      - name: Verify API output
+        run: |
+          if [ ! -d "api-output" ] || [ -z "$(ls -A api-output)" ]; then
+            echo "Error: api-output directory is missing or empty"
+            exit 1
+          fi
+          echo "API output verified: $(find api-output -type f | wc -l) files"
+
       - name: Deploy to api branch
         run: |
           git config --global user.name "github-actions[bot]"

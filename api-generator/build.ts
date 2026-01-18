@@ -27,7 +27,7 @@ async function main() {
   const apis = args.length && !args[0].startsWith("--") ? args[0].split(",").filter(a => GENERATORS[a]) : DEFAULT_ORDER;
   
   console.log(`Building API → ${API_OUTPUT_DIR}/`);
-  if (args.includes("--clean")) await rm(API_OUTPUT_DIR, { recursive: true, force: true });
+  await rm(API_OUTPUT_DIR, { recursive: true, force: true });
   await mkdir(API_OUTPUT_DIR, { recursive: true });
   
   const ctx = apis.some(a => NEEDS_DATA.has(a)) ? await loadData() : undefined;
