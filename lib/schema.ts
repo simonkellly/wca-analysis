@@ -107,12 +107,9 @@ export type Result = {
 };
 
 export type ResultAttempt = {
-  id: number;
   value: number;
   attempt_number: number;
   result_id: number;
-  created_at: string;
-  updated_at: string;
 };
 
 export type RoundType = {
@@ -230,14 +227,11 @@ export function processRanksSingleTSVString(line: string): RanksSingle {
 }
 
 export function processResultAttemptTSVString(line: string): ResultAttempt {
-  const [id, value, attempt_number, result_id, created_at, updated_at] = line.split('\t');
+  const [value, attempt_number, result_id] = line.split('\t');
   return {
-    id: parseInt(id),
     value: parseInt(value),
     attempt_number: parseInt(attempt_number),
     result_id: parseInt(result_id),
-    created_at,
-    updated_at,
   };
 }
 
@@ -275,7 +269,7 @@ export function processResultTSVString(line: string): Result {
 }
 
 export function processRoundTypeTSVString(line: string): RoundType {
-  const [id, cell_name, final, name, rank] = line.split('\t');
+  const [id, final, name, rank, cell_name] = line.split('\t');
   return {
     id: parseInt(id),
     cell_name,

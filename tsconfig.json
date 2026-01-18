@@ -22,12 +22,10 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false,
-
-    // Path aliases
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./lib/*"]
-    }
+    "noPropertyAccessFromIndexSignature": false
+  },
+  "baseUrl": ".",
+  "paths": {
+    "@/*": ["./lib/*"]
   }
 }

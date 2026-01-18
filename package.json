@@ -3,17 +3,23 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "db": "bun run lib/update-db.ts"
+    "db": "bun run lib/update-db.ts",
+    "api:build": "bun run api-generator/build.ts",
+    "api:build:quick": "bun run api-generator/build.ts continent,country,event,version",
+    "test": "bun test",
+    "test:api": "bun test api-generator/test"
   },
   "devDependencies": {
     "@types/bun": "^1.3.5",
-    "@wca/helpers": "^1.1.6"
+    "@wca/helpers": "^1.1.6",
+    "ts-patch": "^3.3.0"
   },
   "peerDependencies": {
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "linq-to-typescript": "^12.0.0",
+    "udsv": "^0.7.3",
     "unzipper": "^0.12.3"
   }
 }
