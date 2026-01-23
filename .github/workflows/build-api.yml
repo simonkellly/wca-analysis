@@ -32,7 +32,7 @@ jobs:
         run: bun run db
 
       - name: Build API
-        run: bun run api-generator/build.ts competition
+        run: bun run api-generator/build.ts
 
       - name: Verify API output
         run: |
