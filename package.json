@@ -4,6 +4,9 @@
   "type": "module",
   "scripts": {
     "db": "bun run lib/update-db.ts",
+    "wca-dev:build": "bun wca-dev/build.ts",
+    "wca-dev:ui": "bun wca-dev/ui.ts",
+    "wca-dev:binaries": "bun wca-dev/prepare-binaries.ts --all",
     "api:build": "bun run api-generator/build.ts",
     "api:build:quick": "bun run api-generator/build.ts continent,country,event,version",
     "test": "bun test",

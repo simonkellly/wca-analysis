@@ -1,14 +1,23 @@
 {
   "name": "WCA Analysis",
   "features": {
-    "ghcr.io/devcontainers-extra/features/bun:1": {}
+    "ghcr.io/devcontainers-extra/features/bun:1": {},
+    "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {
+      "version": "latest"
+    }
+  },
+  "forwardPorts": [4213],
+  "portsAttributes": {
+    "4213": {
+      "label": "DuckDB UI",
+      "onAutoForward": "notify"
+    }
   },
   "customizations": {
     "vscode": {
-      "extensions": [
-        "oven.bun-vscode"
-      ]
+      "extensions": ["oven.bun-vscode"]
     }
   },
-  "postCreateCommand": "bun install && bun run db"
+  "postCreateCommand": "bun install",
+  "postAttachCommand": "bash .devcontainer/post-attach.sh"
 }

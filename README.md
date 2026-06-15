@@ -29,8 +29,16 @@ bun run scripts/example.ts
 
 ### GitHub Codespaces
 
-To easily try out this project, you can use GitHub codespaces. Due to the devcontainer configuration, it will automatically include Bun and download the WCA data.
-To do this click "Code" → "Codespaces" → "Create codespace on main".
+To easily try out this project, create a codespace: **Code → Codespaces → Create codespace on main**.
+
+The devcontainer installs Bun and DuckDB. On attach you'll see quick-start commands.
+
+| Goal | Command |
+|---|---|
+| Standard WCA export (TSV) | `bun run db` |
+| Full developer database + DuckDB UI | `bun run wca-dev:ui` |
+
+The developer database download is ~5 GB on first run. The DuckDB UI opens on port **4213** (auto-forwarded in Codespaces). See [`wca-dev/README.md`](wca-dev/README.md) for details.
 
 ## Working With Data
 

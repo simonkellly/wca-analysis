@@ -1,0 +1,3 @@
+# Build outputs and downloads — never committed
+cache/
+tool/target/

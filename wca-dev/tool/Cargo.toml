@@ -1,0 +1,20 @@
+[package]
+name = "mysqldump-parquet"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "mysqldump-parquet"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+
+[dependencies]
+arrow = { version = "53", default-features = false }
+parquet = { version = "53", default-features = false, features = ["arrow", "snap", "zstd"] }
+crossbeam-channel = "0.5"
+memchr = "2"
