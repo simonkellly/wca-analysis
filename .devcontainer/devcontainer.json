@@ -15,9 +15,16 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode"]
+      "extensions": ["oven.bun-vscode"],
+      "settings": {
+        "git.autofetch": false
+      }
+    },
+    "codespaces": {
+      "openFiles": ["README.md", "wca-dev/README.md"]
     }
   },
-  "postCreateCommand": "bun install",
+  "onCreateCommand": "bash .devcontainer/setup-git.sh",
+  "postCreateCommand": "bash .devcontainer/setup-git.sh && bun install",
   "postAttachCommand": "bash .devcontainer/post-attach.sh"
 }

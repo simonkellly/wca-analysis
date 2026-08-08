@@ -7,6 +7,7 @@
 // In GitHub Codespaces, open the forwarded port 4213 in your browser.
 
 import { $, spawn } from "bun"
+import { join } from "node:path"
 
 const dir = import.meta.dir
 const dbPath = join(dir, "cache", "wca-dev.duckdb")

@@ -33,6 +33,8 @@ To easily try out this project, create a codespace: **Code → Codespaces → Cr
 
 The devcontainer installs Bun and DuckDB. On attach you'll see quick-start commands.
 
+Codespaces **already shallow-clones** the branch you pick (only recent commits, not the full repo). The `api` branch holds generated API output and is large — avoid creating a codespace on that branch. The devcontainer also configures git to **exclude `api` from fetch** and disables autofetch, so the clone stays small.
+
 | Goal | Command |
 |---|---|
 | Standard WCA export (TSV) | `bun run db` |
